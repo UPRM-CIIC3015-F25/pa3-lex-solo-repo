@@ -554,8 +554,46 @@ class GameState(State):
     #   with the ones after it. Depending on the mode, sort by rank first or suit first, swapping cards when needed
     #   until the entire hand is ordered correctly.
     def SortCards(self, sort_by: str = "suit"):
-        suitOrder = [Suit.HEARTS, Suit.CLUBS, Suit.DIAMONDS, Suit.SPADES]         # Define the order of suits
+        suitOrder = [Suit.HEARTS, Suit.CLUBS, Suit.DIAMONDS, Suit.SPADES]
+
+        suitValue = {
+            Suit.HEARTS: 0,
+            Suit.CLUBS: 1,
+            Suit.DIAMONDS: 2,
+            Suit.SPADES: 3
+        }
+
+        n = len(self.hand)
+
+        for i in range(n):
+            for j in range(i + 1, n):
+                a = self.hand[i]
+                b = self.hand[j]
+
+                a_s = suitValue.get(a.suit, 999)
+                b_s = suitValue.get(b.suit, 999)
+                a_r = a.rank.value
+                b_r = b.rank.value
+
+                should_swap = False
+
+                if sort_by == "rank":
+                    # Rank-first (higher ranks first), then suit order
+                    if b_r > a_r:
+                        should_swap = True
+                    elif b_r == a_r and b_s < a_s:
+                        should_swap = True
+                else:
+                    if b_s < a_s:
+                        should_swap = True
+                    elif b_s == a_s and b_r > a_r:
+                        should_swap = True
+
+                if should_swap:
+                    self.hand[i], self.hand[j] = self.hand[j], self.hand[i]
+
         self.updateCards(400, 520, self.cards, self.hand, scale=1.2)
+
 
     def checkHoverCards(self):
         mousePos = pygame.mouse.get_pos()
