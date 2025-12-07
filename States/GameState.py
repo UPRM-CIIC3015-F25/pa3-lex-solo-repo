@@ -855,4 +855,62 @@ class GameState(State):
     #   recursion finishes, reset card selections, clear any display text or tracking lists, and
     #   update the visual layout of the player's hand.
     def discardCards(self, removeFromHand: bool):
-        self.updateCards(400, 520, self.cards, self.hand, scale=1.2)
+
+        # ---------------- BASE CASE ----------------
+        # No more selected cards to remove -> refill hand and reset UI state
+        if len(self.cardsSelectedList) == 0:
+
+            # Recursively draw cards until the hand has 8 or the deck is empty
+            def refill_to_eight():
+                if len(self.hand) >= 8:
+                    return
+                if len(self.deck) == 0:
+                    return
+
+                drawn = State.deckManager.dealCards(self.deck, 1)
+
+                # dealCards usually returns a list
+                if isinstance(drawn, list):
+                    if len(drawn) > 0:
+                        self.hand.append(drawn[0])
+                else:
+                    # fallback just in case
+                    self.hand.append(drawn)
+
+                refill_to_eight()
+
+            refill_to_eight()
+
+            # Reset selections and any related display state
+            self.cardsSelectedList.clear()
+            self.cardsSelectedRect.clear()
+
+            # Clear any lingering played-hand UI (safe for both manual discard & post-play cleanup)
+            self.playedHandName = ""
+            self.playedHandTextSurface = None
+            self.scoreBreakdownTextSurface = None
+            self.playerInfo.curHandOfPlayer = ""
+            self.playerInfo.curHandText = self.playerInfo.textFont1.render("", False, 'white')
+
+            # Update visuals
+            self.updateCards(400, 520, self.cards, self.hand, scale=1.2)
+            return
+
+        # ---------------- RECURSIVE STEP ----------------
+        # Remove exactly ONE selected card, then recurse
+        card = self.cardsSelectedList[0]
+
+        # Deselect the card
+        card.isSelected = False
+
+        # Remove from selected list first
+        self.cardsSelectedList.pop(0)
+
+        # If we are truly discarding from hand:
+        if removeFromHand:
+            if card in self.hand:
+                self.hand.remove(card)
+            self.used.append(card)
+
+        # Recurse to discard the next selected card
+        self.discardCards(removeFromHand)
