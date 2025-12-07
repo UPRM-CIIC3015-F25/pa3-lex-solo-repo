@@ -170,6 +170,16 @@ class DeckManager:
         deckJokers = []
 
         priceMap = {
+            "Fibonacci": 7,
+            "Michael Myers": 8,
+            "? Block": 4,
+            "Hogwarts": 7,
+            "StrawHat": 5,
+            "802": 6,
+            "Ogre": 6,
+            "Hog Rider": 4,
+            "Gauntlet": 9,
+            "The Joker": 3
         }
 
         for name, image in jokerImages.items():
@@ -182,6 +192,7 @@ class DeckManager:
             deckJokers.append(joker)
 
         return deckJokers
+
 
     # ---------- Utilities ----------
     def shuffleDeck(self, deck): # Shuffles any given deck of card or joker objects
