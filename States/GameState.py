@@ -534,8 +534,53 @@ class GameState(State):
     #     - Recursive calculation of the overkill bonus (based on how much score exceeds the target)
     #     - A clear base case to stop recursion when all parts are done
     #   Avoid any for/while loops — recursion alone must handle the repetition.
-    def calculate_gold_reward(self, playerInfo, stage=0):
+    def calculate_gold_reward(self, playerInfo, stage=0, base=0, bonus=0):
+        if playerInfo is None:
             return 0
+
+        cur = playerInfo.levelManager.curSubLevel
+
+        # -------- stage 0: determine base reward --------
+        if stage == 0:
+            base = 4  # default Small
+
+            # Try robust detection of blind type
+            blind_type = str(getattr(cur, "blindType", "")).upper()
+            blind_name = str(getattr(cur, "name", "")).lower()
+            boss_name = getattr(cur, "bossLevel", None)
+
+            if boss_name:  # your code already uses this to detect boss
+                base = 10
+            elif "BIG" in blind_type or "big" in blind_name:
+                base = 8
+            elif "SMALL" in blind_type or "small" in blind_name:
+                base = 4
+
+            return self.calculate_gold_reward(playerInfo, stage=1, base=base)
+
+        # -------- stage 1: compute bonus --------
+        if stage == 1:
+            target = getattr(cur, "score", 0)
+            score = getattr(playerInfo, "roundScore", 0)
+
+            if target and target > 0 and score > target:
+                # Overkill formula (clamped to 0..5)
+                ratio = (score - target) / target
+                bonus = int(min(5, max(0, ratio * 5)))
+            else:
+                bonus = 0
+
+            return self.calculate_gold_reward(playerInfo, stage=2, base=base, bonus=bonus)
+
+        # -------- stage 2: recursively add base + bonus --------
+        total = base + bonus
+
+        def add_gold(n):
+            if n <= 0:
+                return 0
+            return 1 + add_gold(n - 1)
+
+        return add_gold(total)
 
     def updateCards(self, posX, posY, cardsDict, cardsList, scale=1.5, spacing=90, baseYOffset=-20, leftShift=40):
         cardsDict.clear()
