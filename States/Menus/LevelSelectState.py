@@ -116,8 +116,16 @@ class LevelSelectState(State):
         #   what unique restriction or ability that boss applies during the round.
         #   This dictionary will later be used to look up and apply special effects based on which boss is active.
         boss_abilities = {
-
+            "The Water": "Start this blind with no discards.",
+            "The Mark": "All face cards (J,Q,K) are drawn face down.",
+            "The House": "Your first hand of the blind is dealt face down.",
+            "The Hook": "After you play a hand, 2 random unplayed cards are discarded.",
+            "The Manacle": "Your maximum hand size is reduced by 1.",
+            "The Needle": "You may play only one hand this blind (target is Small Blind score).",
+            "The Club": "Club cards are debuffed and give no chips or mult this blind.",
+            "The Goad": "Spade cards are debuffed and give no chips or mult this blind.",
         }
+
 
         # Dict of boss with their color schemes
         # key - boss name : str, value - (header color : tuple, background color : tuple)
