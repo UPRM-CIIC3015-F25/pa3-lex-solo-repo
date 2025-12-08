@@ -676,25 +676,6 @@ class GameState(State):
     
     # -------- Play Hand Logic -----------
     def playHand(self):
-        if self.playerInfo.amountOfHands == 0: # Check if last hand and failed the round
-            target_score = self.playerInfo.levelManager.curSubLevel.score
-            if self.playerInfo.roundScore < target_score:
-                pygame.mixer.music.stop()
-                self.gameOverSound.play()
-                self.showRedTint = True
-
-                for alpha in range(0, 180, 10):
-                    self.redAlpha = alpha
-                    self.draw()
-                    tint = pygame.Surface((1300, 750), pygame.SRCALPHA)
-                    tint.fill((255, 0, 0, alpha))
-                    self.screen.blit(tint, (0, 0))
-                    pygame.display.update()
-                    pygame.time.wait(80)
-
-                pygame.time.wait(1200)
-                pygame.quit()
-
         self.playerInfo.amountOfHands -= 1
         hand_name = evaluate_hand(self.cardsSelectedList)
         self.playedHandName = hand_name
