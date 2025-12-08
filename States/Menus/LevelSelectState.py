@@ -85,11 +85,38 @@ class LevelSelectState(State):
 
                 # If there's a next sublevel, set it as current
                 lm.curSubLevel = nxt
+
                 # TODO (TASK 9.2) - Adjust player limits and reset values based on the current Boss Blind.
                 #   Implement conditional logic that modifies the player's hand and discard limits depending
                 #   on which boss is active.
                 #   Finally, make sure to reset the player’s round score to 0 at the end of this setup.
                 #   Avoid unnecessary repetition—use clear condition structure to make the logic readable.
+                base_hands = 4
+                base_discards = 4
+
+                boss_name = lm.curSubLevel.bossLevel
+
+                # Start from defaults
+                hands = base_hands
+                discards = base_discards
+
+                # Apply boss-specific debuffs
+                if boss_name == "The Water":
+                    # No discards this blind
+                    discards = 0
+                elif boss_name == "The Needle":
+                    # Only one hand this blind
+                    hands = 1
+                elif boss_name == "The Manacle":
+                    # Fewer hands than normal (simulating a stricter limit)
+                    hands = 3
+                # Other bosses (The Mark, The House, The Hook, etc.)
+                # keep the default limits.
+
+                # Commit limits back to the player
+                self.playerInfo.amountOfHands = hands
+                self.playerInfo.amountOfDiscards = discards
+
                 self.playerInfo.roundScore = 0
                 
                 # Set target score for the new sublevel
